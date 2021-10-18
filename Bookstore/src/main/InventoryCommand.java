@@ -1,23 +1,12 @@
 package main;
 
-public interface InventoryCommand{
-	public void execute(Book toAdd);
-	public void undo();
-}
+import java.io.Serializable;
 
-class AddBookCommand implements InventoryCommand{
-	private Inventory inventory;
-	
-	public AddBookCommand(Inventory inv) {
-		this.inventory = inv;
-	}
-	
-	public void execute(Book toAdd) {
-	}
-	
-	public void undo() {
-	}
-	
-	public void store() {
-	}
+public abstract class InventoryCommand implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public abstract double execute(Inventory toExecuteOn);
 }
