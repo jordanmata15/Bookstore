@@ -36,15 +36,15 @@ public class MementoDecorator implements Inventory{
 	}
 	
 	@Override
-	public double addBook(Book toAdd) {
-		double bookCount = this.decoratedInventory.addBook(toAdd);
+	public int addBook(Book toAdd) {
+		int bookCount = this.decoratedInventory.addBook(toAdd);
 		this.handleAction();
 		return bookCount;
 	}
 
 	@Override
-	public double sellBook(Book toSell) {
-		double bookCount = this.decoratedInventory.sellBook(toSell);
+	public int sellBook(Book toSell) {
+		int bookCount = this.decoratedInventory.sellBook(toSell);
 		this.handleAction();
 		return bookCount;
 	}
@@ -96,7 +96,6 @@ public class MementoDecorator implements Inventory{
 	}
 	
 	
-	
 	private boolean writeOut() {
 		File mementoFile = new File(this.fullMementoPath);
 		InventoryMemento currentState = new InventoryMemento(decoratedInventory);
@@ -110,6 +109,7 @@ public class MementoDecorator implements Inventory{
 		}
 		catch (Exception e){ return false; }
 	}
+	
 	
 	private void recoverFromBackup() {
 		File mementoFile = new File(this.fullMementoPath);
@@ -131,8 +131,7 @@ public class MementoDecorator implements Inventory{
 		filesList.forEach(file->{
 							File newName = new File("temp_"+file.getName());
 							file.renameTo(newName);
-								});
-		
+							});
 	}
 	
 	

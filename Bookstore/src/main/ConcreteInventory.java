@@ -22,7 +22,7 @@ public class ConcreteInventory implements Inventory{
 	}
 	
 	@Override
-	public double addBook(Book toAdd) {
+	public int addBook(Book toAdd) {
 		if (this.existsBookTitle(toAdd.getTitle()))
 			return this.addExistingBook(toAdd);
 		else
@@ -49,7 +49,7 @@ public class ConcreteInventory implements Inventory{
 	}
 	
 	@Override
-	public double sellBook(Book toSell) throws NoSuchElementException{
+	public int sellBook(Book toSell) throws NoSuchElementException{
 		if (this.existsBook(toSell) && this.getQuantityByID(toSell.getID()) > 0)
 			throw new NoSuchElementException();
 		Book bookReferenceToSellFrom = this.idToBookMap.get(toSell.getID());

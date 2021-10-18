@@ -26,17 +26,17 @@ public class CommandDecorator implements Inventory{
 	}
 	
 	@Override
-	public double addBook(Book toAdd) {
+	public int addBook(Book toAdd) {
 		InventoryCommand command = new AddBookCommand(toAdd);
-		double bookCount = command.execute(decoratedInventory);
+		int bookCount = (int) command.execute(decoratedInventory);
 		this.serialize(command);
 		return bookCount;
 	}
 
 	@Override
-	public double sellBook(Book toSell) {
+	public int sellBook(Book toSell) {
 		InventoryCommand command = new SellBookCommand(toSell);
-		double bookCount = command.execute(decoratedInventory);
+		int bookCount = (int) command.execute(decoratedInventory);
 		this.serialize(command);
 		return bookCount;
 	}
