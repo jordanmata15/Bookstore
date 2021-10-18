@@ -1,6 +1,14 @@
 package main;
 
-public class Book {
+import java.io.Serializable;
+
+public class Book implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private String title;
 	private int id;
 	private int quantity;
@@ -41,8 +49,12 @@ public class Book {
 		return this.quantity;
 	}
 
-	public void addQuantity(int quantity) {
+	public void incrementQuantity(int quantity) {
 		this.quantity += quantity;
 	}
 	
+	@Override
+	public String toString() {
+		return this.title + "_" + this.id;
+	}
 }
