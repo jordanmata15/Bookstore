@@ -27,10 +27,10 @@ public class PersistentInventory implements Inventory{
 	String fullMementoPath;
 	final int actionsBeforeDump = 10;
 	
-	public PersistentInventory(Inventory inv, String logTo) {
+	public PersistentInventory(String logTo) {
 		this.filePath = logTo;
 		this.fullMementoPath = this.filePath + File.separator + this.fileName;
-		this.internalInventory = inv;
+		this.internalInventory = new ConcreteInventory();
 		this.actionsCount = 0;
 		this.recoverFromBackup();
 	}

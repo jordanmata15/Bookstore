@@ -37,7 +37,7 @@ class TestInventory {
 		this.clearLogFiles(this.logPath);
 		
 		inventory = new ConcreteInventory();
-		inventory = new PersistentInventory(inventory, this.logPath);
+		inventory = new PersistentInventory(this.logPath);
 		inventory = new CommandDecorator(inventory, this.logPath);
 		
 		bookList = new ArrayList<Book>(19);
@@ -83,14 +83,14 @@ class TestInventory {
 			assertEquals(this.inventory.addBook(book), 0.0);
 		}	
 		
-		/*
+		
 		this.bookList.forEach(book->this.testBookExistence(this.inventory, book));
 		
 		
 		Inventory toRecoverToConcrete = new ConcreteInventory();
 		this.bookList.forEach(book->this.testNonExistenceException(toRecoverToConcrete, book));
 		
-		Inventory toRecoverSnapshot = new MementoDecorator(toRecoverToConcrete, this.logPath);
+		Inventory toRecoverSnapshot = new PersistentInventory(this.logPath);
 		this.bookList.subList(0,10).forEach(book->this.testBookExistence(toRecoverSnapshot, book));
 		this.bookList.subList(10,19).forEach(book->this.testNonExistenceException(toRecoverSnapshot, book));
 		
@@ -101,7 +101,6 @@ class TestInventory {
 		
 		Inventory toRecoverSnapAndReplay = new CommandDecorator(toRecoverSnapshot, this.logPath);
 		this.bookList.forEach(book->this.testBookExistence(toRecoverSnapAndReplay, book));
-		*/
 	}
 	
 	public void testNonExistenceException(Inventory inventoryToTest, Book book){
