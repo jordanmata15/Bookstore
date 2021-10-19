@@ -13,12 +13,10 @@ public class ConcreteInventory implements Inventory{
 	
 	private Map<String, Integer> titleToIDMap;
 	private Map<Integer, Book> idToBookMap;
-	private int uniqueBookCount;
 	
 	public ConcreteInventory() {
 		this.titleToIDMap = new HashMap<String, Integer>();
 		this.idToBookMap = new HashMap<Integer, Book>();
-		this.uniqueBookCount = 0;
 	}
 	
 	@Override
@@ -30,40 +28,38 @@ public class ConcreteInventory implements Inventory{
 	}
 	
 	private int addNewBook(Book toAdd) {
-		if (toAdd.getID() < 0) {
-			while (this.idToBookMap.containsKey(this.uniqueBookCount))
-				this.uniqueBookCount++;
-			toAdd.setId(this.uniqueBookCount);
-		}
+		if (toAdd.getID() < 0)
+			toAdd.setID(this.getNextValidID());
+		
 		this.titleToIDMap.put(toAdd.getTitle(), toAdd.getID());
 		this.idToBookMap.put(toAdd.getID(), toAdd);
-		this.uniqueBookCount++;
 		return toAdd.getQuantity();
 	}
 	
 	private int addExistingBook(Book toAdd) {
 		Integer uniqueID = toAdd.getID();
 		Book bookReferenceToAddTo = this.idToBookMap.get(uniqueID);
-		bookReferenceToAddTo.incrementQuantity(1);
+		bookReferenceToAddTo.incrementQuantity(toAdd.getQuantity());
 		return bookReferenceToAddTo.getQuantity();
 	}
 	
 	@Override
 	public int sellBook(Book toSell) throws NoSuchElementException{
-		if (this.existsBook(toSell) && this.getQuantityByID(toSell.getID()) > 0)
+		// TODO
+		if (!this.existsBook(toSell) || this.getQuantityByID(toSell.getID()) <= 0)
 			throw new NoSuchElementException();
 		Book bookReferenceToSellFrom = this.idToBookMap.get(toSell.getID());
-		bookReferenceToSellFrom.incrementQuantity(-1);
+		bookReferenceToSellFrom.incrementQuantity(-toSell.getQuantity());
 		return bookReferenceToSellFrom.getQuantity();
 	}
 	
 	@Override
 	public double updatePrice(Book toUpdate) {
-		if (this.existsBook(toUpdate))
+		// TODO
+		if (!this.existsBook(toUpdate))
 			throw new NoSuchElementException();
-		double newPrice = toUpdate.getPrice();
 		Book bookReferenceToUpdate = this.idToBookMap.get(toUpdate.getID());
-		bookReferenceToUpdate.setPrice(newPrice);
+		bookReferenceToUpdate.setPrice(toUpdate.getPrice());
 		return bookReferenceToUpdate.getPrice();
 	}
 	
@@ -122,6 +118,13 @@ public class ConcreteInventory implements Inventory{
 			return true;
 		else
 			return false;
+	}
+	
+	private int getNextValidID() {
+		int nextID = this.idToBookMap.size(); 
+		while(this.idToBookMap.containsKey(nextID))
+			nextID++;
+		return nextID;
 	}
 	
 	public String toString() {
