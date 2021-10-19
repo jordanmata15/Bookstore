@@ -16,7 +16,7 @@ public class Book implements Serializable{
 	
 	public Book(String title, int id, int quantity, Double price) {
 		this.setTitle(title);
-		this.setId(id);
+		this.setID(id);
 		this.quantity = quantity;
 		this.setPrice(price);
 	}
@@ -33,7 +33,7 @@ public class Book implements Serializable{
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setID(int id) {
 		this.id = id;
 	}
 
