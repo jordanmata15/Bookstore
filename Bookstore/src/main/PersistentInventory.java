@@ -14,66 +14,66 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MementoDecorator implements Inventory{
+public class PersistentInventory implements Inventory{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	Inventory decoratedInventory;
+	Inventory internalInventory;
 	int actionsCount;
 	final String filePath;
 	final String fileName = "InventoryMemento.ser";
 	String fullMementoPath;
 	final int actionsBeforeDump = 10;
 	
-	public MementoDecorator(Inventory inv, String logTo) {
+	public PersistentInventory(Inventory inv, String logTo) {
 		this.filePath = logTo;
 		this.fullMementoPath = this.filePath + File.separator + this.fileName;
-		this.decoratedInventory = inv;
+		this.internalInventory = inv;
 		this.actionsCount = 0;
 		this.recoverFromBackup();
 	}
 	
 	@Override
 	public int addBook(Book toAdd) {
-		int bookCount = this.decoratedInventory.addBook(toAdd);
+		int bookCount = this.internalInventory.addBook(toAdd);
 		this.handleAction();
 		return bookCount;
 	}
 
 	@Override
 	public int sellBook(Book toSell) {
-		int bookCount = this.decoratedInventory.sellBook(toSell);
+		int bookCount = this.internalInventory.sellBook(toSell);
 		this.handleAction();
 		return bookCount;
 	}
 
 	@Override
 	public double updatePrice(Book toUpdate) {
-		double priceChanged = this.decoratedInventory.updatePrice(toUpdate);
+		double priceChanged = this.internalInventory.updatePrice(toUpdate);
 		this.handleAction();
 		return priceChanged;
 	}
 
 	@Override
 	public double getPriceByID(Integer toFind) {
-		return this.decoratedInventory.getPriceByID(toFind);
+		return this.internalInventory.getPriceByID(toFind);
 	}
 	
 	@Override
 	public double getPriceByTitle(String toFind) {
-		return this.decoratedInventory.getPriceByTitle(toFind);
+		return this.internalInventory.getPriceByTitle(toFind);
 	}
 
 	@Override
 	public int getQuantityByID(Integer toFind) {
-		return this.decoratedInventory.getQuantityByID(toFind);
+		return this.internalInventory.getQuantityByID(toFind);
 	}
 	
 	@Override
 	public int getQuantityByTitle(String toFind) {
-		return this.decoratedInventory.getQuantityByTitle(toFind);
+		return this.internalInventory.getQuantityByTitle(toFind);
 	}
 	
 	private void handleAction() {
@@ -98,7 +98,7 @@ public class MementoDecorator implements Inventory{
 	
 	private boolean writeOut() {
 		File mementoFile = new File(this.fullMementoPath);
-		InventoryMemento currentState = new InventoryMemento(decoratedInventory);
+		InventoryMemento currentState = new InventoryMemento(internalInventory);
 		try {
 			FileOutputStream outputStream = new FileOutputStream(mementoFile);
 			ObjectOutputStream objectStream = new ObjectOutputStream(outputStream);
@@ -119,7 +119,7 @@ public class MementoDecorator implements Inventory{
 			FileInputStream outputStream = new FileInputStream(mementoFile);
 			ObjectInputStream objectStream = new ObjectInputStream(outputStream);
 			InventoryMemento inventoryMemento = (InventoryMemento) objectStream.readObject();
-			this.decoratedInventory = inventoryMemento.getState();
+			this.internalInventory = inventoryMemento.getState();
 			objectStream.close();
 			outputStream.close();
 		}

@@ -24,7 +24,7 @@ import main.Book;
 import main.CommandDecorator;
 import main.ConcreteInventory;
 import main.Inventory;
-import main.MementoDecorator;
+import main.PersistentInventory;
 
 class TestInventory {
 
@@ -37,7 +37,7 @@ class TestInventory {
 		this.clearLogFiles(this.logPath);
 		
 		inventory = new ConcreteInventory();
-		inventory = new MementoDecorator(inventory, this.logPath);
+		inventory = new PersistentInventory(inventory, this.logPath);
 		inventory = new CommandDecorator(inventory, this.logPath);
 		
 		bookList = new ArrayList<Book>(19);
