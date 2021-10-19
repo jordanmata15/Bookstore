@@ -28,25 +28,22 @@ public class CommandDecorator implements Inventory{
 	@Override
 	public int addBook(Book toAdd) {
 		InventoryCommand command = new AddBookCommand(toAdd);
-		int bookCount = (int) command.execute(decoratedInventory);
 		this.serialize(command);
-		return bookCount;
+		return (int) command.execute(decoratedInventory);
 	}
 
 	@Override
 	public int sellBook(Book toSell) {
 		InventoryCommand command = new SellBookCommand(toSell);
-		int bookCount = (int) command.execute(decoratedInventory);
 		this.serialize(command);
-		return bookCount;
+		return (int) command.execute(decoratedInventory);
 	}
 
 	@Override
 	public double updatePrice(Book toUpdate) {
 		InventoryCommand command = new UpdatePriceCommand(toUpdate);
-		double bookPrice = command.execute(decoratedInventory);
 		this.serialize(command);
-		return bookPrice;
+		return command.execute(decoratedInventory);
 	}
 
 	@Override
@@ -73,7 +70,6 @@ public class CommandDecorator implements Inventory{
 		this.validatePreviousCommandNumber();
 		String filePath = this.fileCompletePath("command_" + (this.commandsSoFar) + ".ser");
 		File nextLogFile = new File(filePath);
-		System.out.println("Creating command" + filePath);
 		try {
 			FileOutputStream outputStream = new FileOutputStream(nextLogFile);
 			ObjectOutputStream objectStream = new ObjectOutputStream(outputStream);
@@ -94,15 +90,13 @@ public class CommandDecorator implements Inventory{
 			objectStream.close();
 			inputStream.close();
 			return command;
-		} catch (Exception e) { }
+		} catch (Exception e) { System.out.println("ERORORROROROR");}
 		this.commandsSoFar++;
 		return null; // TODO null check? Replace with blank command?
 	}
 	
 	private void validatePreviousCommandNumber() {
-		if (this.commandsSoFar == 0)
-			return;
-		if (this.existsCommandLogFile(this.commandsSoFar-1))
+		if (this.commandsSoFar == 0 || this.existsCommandLogFile(this.commandsSoFar-1))
 			return;
 		else 
 			this.commandsSoFar = 0;
@@ -121,7 +115,7 @@ public class CommandDecorator implements Inventory{
 	private void replayLoggedCommands() {
 		while (this.existsCommandLogFile(this.commandsSoFar)) {
 			InventoryCommand command = this.deserialize(this.commandsSoFar);
-			command.execute(decoratedInventory);
+			command.execute(this.decoratedInventory);
 			this.commandsSoFar++;
 		}
 	}
