@@ -1,5 +1,8 @@
 package main;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 public class SellBookCommand extends InventoryCommand{
 
 	/**
@@ -13,7 +16,7 @@ public class SellBookCommand extends InventoryCommand{
 	}
 	
 	@Override
-	public double execute(Inventory toExecuteOn) {
+	public double execute(Inventory toExecuteOn) throws NoSuchElementException, IOException {
 		return toExecuteOn.sellBook(toExecuteWith);
 	}
 }

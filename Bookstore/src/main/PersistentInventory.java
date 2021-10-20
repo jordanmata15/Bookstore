@@ -20,14 +20,14 @@ public class PersistentInventory implements Inventory{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	Inventory internalInventory;
+	SimpleInventory internalInventory;
 	int actionsCount;
 	final String filePath;
 	final String fileName = "InventoryMemento.ser";
 	String fullMementoPath;
 	final int actionsBeforeDump = 10;
 	
-	public PersistentInventory(String logTo) {
+	public PersistentInventory(String logTo) throws ClassNotFoundException, IOException {
 		this.filePath = logTo;
 		this.fullMementoPath = this.filePath + File.separator + this.fileName;
 		this.internalInventory = new SimpleInventory();
@@ -36,21 +36,21 @@ public class PersistentInventory implements Inventory{
 	}
 	
 	@Override
-	public int addBook(Book toAdd) {
+	public int addBook(Book toAdd) throws IOException {
 		int bookCount = this.internalInventory.addBook(toAdd);
 		this.handleAction();
 		return bookCount;
 	}
 
 	@Override
-	public int sellBook(Book toSell) {
+	public int sellBook(Book toSell) throws IOException {
 		int bookCount = this.internalInventory.sellBook(toSell);
 		this.handleAction();
 		return bookCount;
 	}
 
 	@Override
-	public double updatePrice(Book toUpdate) {
+	public double updatePrice(Book toUpdate) throws IOException {
 		double priceChanged = this.internalInventory.updatePrice(toUpdate);
 		this.handleAction();
 		return priceChanged;
@@ -76,7 +76,7 @@ public class PersistentInventory implements Inventory{
 		return this.internalInventory.getQuantityByTitle(toFind);
 	}
 	
-	private void handleAction() {
+	private void handleAction() throws IOException {
 		this.actionsCount++;
 		if (this.actionsCount >= this.actionsBeforeDump) {
 			this.dumpInventoryToFile();
@@ -84,11 +84,10 @@ public class PersistentInventory implements Inventory{
 	}
 	
 	
-	private void dumpInventoryToFile() {
+	private void dumpInventoryToFile() throws IOException {
 		File mementoFile = new File(this.fullMementoPath);
 		List<File> commandLogsAndInvMemento = this.getLogFiles();
 		commandLogsAndInvMemento.add(mementoFile);
-		
 		this.renameRedundantFiles(commandLogsAndInvMemento);
 		this.writeOut();
 		this.clearRedundantFiles(commandLogsAndInvMemento);
@@ -111,7 +110,7 @@ public class PersistentInventory implements Inventory{
 	}
 	
 	
-	private void recoverFromBackup() {
+	private void recoverFromBackup() throws IOException, ClassNotFoundException {
 		File mementoFile = new File(this.fullMementoPath);
 		if (!mementoFile.exists())
 			return;
@@ -119,11 +118,13 @@ public class PersistentInventory implements Inventory{
 			FileInputStream outputStream = new FileInputStream(mementoFile);
 			ObjectInputStream objectStream = new ObjectInputStream(outputStream);
 			InventoryMemento inventoryMemento = (InventoryMemento) objectStream.readObject();
-			this.internalInventory = inventoryMemento.getState();
+			this.internalInventory = (SimpleInventory) inventoryMemento.getState();
 			objectStream.close();
 			outputStream.close();
 		}
-		catch (Exception e){ e.printStackTrace(); }
+		catch (IOException | ClassNotFoundException e){
+			throw e;
+		}
 	}
 	
 	
@@ -137,13 +138,16 @@ public class PersistentInventory implements Inventory{
 	
 	private void clearRedundantFiles(List<File> redundantFilesList) {
 		redundantFilesList.forEach(file->{
-										file = new File(this.filePath+File.separator+"temp_"+file.getName());
+										file = new File(this.filePath	+
+														File.separator	+
+														"temp_"			+
+														file.getName());
 										file.delete();	
 										});
 	}
 	
 	
-	private List<File> getLogFiles() {
+	private List<File> getLogFiles() throws IOException {
 		List<File> commandLogFiles = new ArrayList<File>();
 		String commandLogRegex = ".?command_\\d+\\.ser";
 		try {
@@ -154,6 +158,7 @@ public class PersistentInventory implements Inventory{
 							        .collect(Collectors.toList());
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw e;
 		}
 		return commandLogFiles;
 	}

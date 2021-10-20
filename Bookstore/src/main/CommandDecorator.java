@@ -19,7 +19,8 @@ public class CommandDecorator implements Inventory{
 	String folderName;
 	int commandsSoFar;
 	
-	public CommandDecorator(Inventory toDecorate, String logTo) {
+	public CommandDecorator(Inventory toDecorate, String logTo) throws ClassNotFoundException,
+																		IOException {
 		this.decoratedInventory = toDecorate;
 		this.folderName = logTo;
 		this.commandsSoFar = 0;
@@ -27,14 +28,14 @@ public class CommandDecorator implements Inventory{
 	}
 	
 	@Override
-	public int addBook(Book toAdd) {
+	public int addBook(Book toAdd) throws NoSuchElementException, IOException {
 		InventoryCommand command = new AddBookCommand(toAdd);
 		this.serialize(command);
 		return (int) command.execute(decoratedInventory);
 	}
 
 	@Override
-	public int sellBook(Book toSell) {
+	public int sellBook(Book toSell) throws IOException {
 		InventoryCommand command = new SellBookCommand(toSell);
 		this.serialize(command);
 		int bookCount;
@@ -48,7 +49,7 @@ public class CommandDecorator implements Inventory{
 	}
 
 	@Override
-	public double updatePrice(Book toUpdate) {
+	public double updatePrice(Book toUpdate) throws IOException {
 		InventoryCommand command = new UpdatePriceCommand(toUpdate);
 		this.serialize(command);
 		double bookPrice;
@@ -81,7 +82,7 @@ public class CommandDecorator implements Inventory{
 		return this.decoratedInventory.getPriceByID(toFind);
 	}
 
-	private void serialize(InventoryCommand command) {
+	private void serialize(InventoryCommand command) throws IOException {
 		this.validatePreviousCommandNumber();
 		String filePath = this.fileCompletePath("command_" + (this.commandsSoFar) + ".ser");
 		File nextLogFile = new File(filePath);
@@ -91,11 +92,13 @@ public class CommandDecorator implements Inventory{
 			objectStream.writeObject(command);
 			objectStream.close();
 			outputStream.close();
-		} catch (Exception e) {System.out.println("ERRORORORORR" /*TODO*/ );}
-		this.commandsSoFar++;
+			this.commandsSoFar++;
+		} catch (IOException e) {
+			throw e;
+		}
 	}
 	
-	private InventoryCommand deserialize(int i) {
+	private InventoryCommand deserialize(int i) throws IOException, ClassNotFoundException {
 		String filePath = this.fileCompletePath("command_" + i + ".ser");
 		File nextLogFile = new File(filePath);
 		try {
@@ -105,9 +108,9 @@ public class CommandDecorator implements Inventory{
 			objectStream.close();
 			inputStream.close();
 			return command;
-		} catch (Exception e) { System.out.println("ERORORROROROR");}
-		this.commandsSoFar++;
-		return null; // TODO null check? Replace with blank command?
+		} catch (IOException | ClassNotFoundException e) {
+			throw e;
+		}
 	}
 	
 	private void validatePreviousCommandNumber() {
@@ -127,7 +130,7 @@ public class CommandDecorator implements Inventory{
 		return commandFile.exists();
 	}
 	
-	private void replayLoggedCommands() {
+	private void replayLoggedCommands() throws ClassNotFoundException, IOException {
 		while (this.existsCommandLogFile(this.commandsSoFar)) {
 			InventoryCommand command = this.deserialize(this.commandsSoFar);
 			command.execute(this.decoratedInventory);

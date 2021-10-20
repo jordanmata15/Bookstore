@@ -1,5 +1,7 @@
 package main;
 
+import java.io.IOException;
+
 public class AddBookCommand extends InventoryCommand{
 
 	/**
@@ -14,7 +16,7 @@ public class AddBookCommand extends InventoryCommand{
 	}
 	
 	@Override
-	public double execute(Inventory toExecuteOn) {
+	public double execute(Inventory toExecuteOn) throws IOException {
 		return toExecuteOn.addBook(toExecuteWith);
 	}
 }
