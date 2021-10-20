@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.NoSuchElementException;
 
 public class CommandDecorator implements Inventory{
 	
@@ -36,14 +37,28 @@ public class CommandDecorator implements Inventory{
 	public int sellBook(Book toSell) {
 		InventoryCommand command = new SellBookCommand(toSell);
 		this.serialize(command);
-		return (int) command.execute(decoratedInventory);
+		int bookCount;
+		try{
+			bookCount = (int) command.execute(decoratedInventory);
+		} catch(NoSuchElementException e) {
+			this.deleteLastSerializedCommand();
+			throw e;
+		}
+		return bookCount;
 	}
 
 	@Override
 	public double updatePrice(Book toUpdate) {
 		InventoryCommand command = new UpdatePriceCommand(toUpdate);
 		this.serialize(command);
-		return command.execute(decoratedInventory);
+		double bookPrice;
+		try{
+			bookPrice = (int) command.execute(decoratedInventory);
+		} catch(NoSuchElementException e) {
+			this.deleteLastSerializedCommand();
+			throw e;
+		}
+		return bookPrice;
 	}
 
 	@Override
@@ -118,5 +133,12 @@ public class CommandDecorator implements Inventory{
 			command.execute(this.decoratedInventory);
 			this.commandsSoFar++;
 		}
+	}
+	
+	private void deleteLastSerializedCommand() {
+		this.commandsSoFar--;
+		String filePath = this.fileCompletePath("command_" + (this.commandsSoFar) + ".ser");
+		File toDelete = new File(filePath);
+		toDelete.delete();
 	}
 }
