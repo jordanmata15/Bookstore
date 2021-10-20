@@ -29,40 +29,63 @@ import main.PersistentInventory;
 class TestInventory {
 
 	String logPath = "C:\\Users\\Jordan\\git\\Bookstore\\Bookstore";
-	Inventory inventory;
-	List<Book> bookList;
+	Inventory originalInventory ;
+	List<Book> bookListZero;
+	List<Book> bookListNonZero;
 	
 	@BeforeEach
 	void setUp() throws Exception {
 		this.clearLogFiles(this.logPath);
 		
-		inventory = new SimpleInventory();
-		inventory = new PersistentInventory(this.logPath);
-		inventory = new CommandDecorator(inventory, this.logPath);
+		originalInventory = new PersistentInventory(this.logPath);
+		originalInventory = new CommandDecorator(originalInventory, this.logPath);
 		
-		bookList = new ArrayList<Book>(19);
+		bookListZero = new ArrayList<Book>(19);
+		bookListNonZero = new ArrayList<Book>(19);
 	
-		bookList.add(new Book("A Tale of Two Cities", 				11, 0, 13.99));
-		bookList.add(new Book("Communist Manifesto", 				3, 0, 2.23));
-		bookList.add(new Book("Harry Potter", 						16, 0, 11.01));
-		bookList.add(new Book("The Hunger Games", 					7, 0, 3.99));
-		bookList.add(new Book("To Kill a MockingBird", 				0, 0, 0.99));
-		bookList.add(new Book("The Great Gatsby", 					2, 0, 20.19));
-		bookList.add(new Book("Java: A Headfirst Approach", 		15, 0, 122.99));
-		bookList.add(new Book("C By Design", 						4, 0, 8.99));
-		bookList.add(new Book("Lord of the Rings", 					9, 0, 4.01));
-		bookList.add(new Book("The Girl with the Dragon Tattoo", 	8, 0, 21.78));
-		bookList.add(new Book("The Hobbit", 						1, 0, 13.99));
-		bookList.add(new Book("Cat in the Hat", 					13, 0, 2.23));
-		bookList.add(new Book("The Giver", 							6, 0, 11.01));
-		bookList.add(new Book("1984", 								17, 0, 3.99));
-		bookList.add(new Book("Storm Front", 						10, 0, 0.99));
-		bookList.add(new Book("Angels and Demons", 					12, 0, 20.19));
-		bookList.add(new Book("Don Quixote", 						5, 0, 122.99));
-		bookList.add(new Book("The Catcher in the Rye", 			14, 0, 8.99));
-		bookList.add(new Book("Charlotte's Web", 					18, 0, 4.01));
+		// books with quantity = 0
+		bookListNonZero.add(new Book("A Tale of Two Cities", 				11, 11, 1.99));
+		bookListNonZero.add(new Book("Communist Manifesto", 				3, 10, 20.23));
+		bookListNonZero.add(new Book("Harry Potter", 						16, 9, 1.01));
+		bookListNonZero.add(new Book("The Hunger Games", 					7, 3, 30.99));
+		bookListNonZero.add(new Book("To Kill a MockingBird", 				0, 190, 10.99));
+		bookListNonZero.add(new Book("The Great Gatsby", 					2, 8, 2.19));
+		bookListNonZero.add(new Book("Java: A Headfirst Approach", 			15, 2, 12.99));
+		bookListNonZero.add(new Book("C By Design", 						4, 10, 0.99));
+		bookListNonZero.add(new Book("Lord of the Rings", 					9, 90, 14.01));
+		bookListNonZero.add(new Book("The Girl with the Dragon Tattoo", 	8, 3, 2.78));
+		bookListNonZero.add(new Book("The Hobbit", 							1, 63, 1.99));
+		bookListNonZero.add(new Book("Cat in the Hat", 						13, 3, 20.23));
+		bookListNonZero.add(new Book("The Giver", 							6, 10, 1.01));
+		bookListNonZero.add(new Book("1984", 								17, 3, 3.99));
+		bookListNonZero.add(new Book("Storm Front", 						10, 8, 10.99));
+		bookListNonZero.add(new Book("Angels and Demons", 					12, 20, 20.19));
+		bookListNonZero.add(new Book("Don Quixote", 						5, 3, 12.99));
+		bookListNonZero.add(new Book("The Catcher in the Rye", 				14, 52, 80.99));
+		bookListNonZero.add(new Book("Charlotte's Web", 					18, 8, 4.01));
+		
+		// books with quantity = 0
+		bookListZero.add(new Book("A Tale of Two Cities", 				11, 0, 13.99));
+		bookListZero.add(new Book("Communist Manifesto", 				3, 0, 2.23));
+		bookListZero.add(new Book("Harry Potter", 						16, 0, 11.01));
+		bookListZero.add(new Book("The Hunger Games", 					7, 0, 3.99));
+		bookListZero.add(new Book("To Kill a MockingBird", 				0, 0, 0.99));
+		bookListZero.add(new Book("The Great Gatsby", 					2, 0, 20.19));
+		bookListZero.add(new Book("Java: A Headfirst Approach", 		15, 0, 122.99));
+		bookListZero.add(new Book("C By Design", 						4, 0, 8.99));
+		bookListZero.add(new Book("Lord of the Rings", 					9, 0, 4.01));
+		bookListZero.add(new Book("The Girl with the Dragon Tattoo", 	8, 0, 21.78));
+		bookListZero.add(new Book("The Hobbit", 						1, 0, 13.99));
+		bookListZero.add(new Book("Cat in the Hat", 					13, 0, 2.23));
+		bookListZero.add(new Book("The Giver", 							6, 0, 11.01));
+		bookListZero.add(new Book("1984", 								17, 0, 13.99));
+		bookListZero.add(new Book("Storm Front", 						10, 0, 0.99));
+		bookListZero.add(new Book("Angels and Demons", 					12, 0, 2.19));
+		bookListZero.add(new Book("Don Quixote", 						5, 0, 122.99));
+		bookListZero.add(new Book("The Catcher in the Rye", 			14, 0, 8.99));
+		bookListZero.add(new Book("Charlotte's Web", 					18, 0, 14.01));
 	}
-
+ 
 	@AfterEach
 	void tearDown() throws Exception {
 	}
@@ -71,37 +94,166 @@ class TestInventory {
 	void testDoNothing() {}
 
 	@Test
-	void testAddBook() {
-		List<Book> originalList = new ArrayList<Book>();
-		this.bookList.forEach(book->originalList.add(new Book(book.getTitle(), 
-															book.getID(), 
-															book.getQuantity(), 
-															book.getPrice())));
-		Collections.shuffle(bookList);
+	void testAdd() throws Exception {
+		for (Book book : this.bookListNonZero)
+			assertEquals(this.originalInventory.addBook(book), book.getQuantity());
 		
-		for (Book book : this.bookList) {
-			assertEquals(this.inventory.addBook(book), 0.0);
-		}	
+		for (Book book : this.bookListNonZero)
+			assertEquals(this.originalInventory.addBook(book), 2*book.getQuantity());
 		
-		
-		this.bookList.forEach(book->this.testBookExistence(this.inventory, book));
-		
-		
-		Inventory toRecoverToConcrete = new SimpleInventory();
-		this.bookList.forEach(book->this.testNonExistenceException(toRecoverToConcrete, book));
-		
-		Inventory toRecoverSnapshot = new PersistentInventory(this.logPath);
-		this.bookList.subList(0,10).forEach(book->this.testBookExistence(toRecoverSnapshot, book));
-		this.bookList.subList(10,19).forEach(book->this.testNonExistenceException(toRecoverSnapshot, book));
-		
-		Inventory toRecoverToWithReplay = new CommandDecorator(toRecoverToConcrete, this.logPath);
-		this.bookList.subList(0,10).forEach(book->this.testNonExistenceException(toRecoverToWithReplay, book));
-		this.bookList.subList(10, 19).forEach(book->this.testBookExistence(toRecoverToWithReplay, book));
-		
-		
-		Inventory toRecoverSnapAndReplay = new CommandDecorator(toRecoverSnapshot, this.logPath);
-		this.bookList.forEach(book->this.testBookExistence(toRecoverSnapAndReplay, book));
+		for (Book book : this.bookListNonZero)
+			assertEquals(this.originalInventory.addBook(book), 3*book.getQuantity());
 	}
+	
+	//@Test
+	void testRecoverInventory() throws Exception {
+		List<Book> originalList = new ArrayList<Book>();
+		this.bookListZero.forEach(book->originalList.add(new Book(book.getTitle(), 
+																book.getID(), 
+																book.getQuantity(), 
+																book.getPrice())));
+		Collections.shuffle(bookListZero);
+		
+		for (Book book : this.bookListZero)
+			assertEquals(this.originalInventory.addBook(book), 0.0);
+		
+		this.bookListZero.forEach(book->this.testBookExistence(this.originalInventory , book));
+		
+		Inventory toRecoverOnlySnapshot = new PersistentInventory(this.logPath);
+		this.bookListZero.subList(0,10).forEach(book->this.testBookExistence(toRecoverOnlySnapshot, book));
+		this.bookListZero.subList(10,19).forEach(book->this.testNonExistenceException(toRecoverOnlySnapshot, book));
+		
+		Inventory toRecoverOnlyReplay = new CommandDecorator(new PersistentInventory(""), this.logPath);
+		this.bookListZero.subList(0,10).forEach(book->this.testNonExistenceException(toRecoverOnlyReplay, book));
+		this.bookListZero.subList(10, 19).forEach(book->this.testBookExistence(toRecoverOnlyReplay, book));
+		
+		Inventory toRecoverSnapAndReplay = new CommandDecorator(toRecoverOnlySnapshot, this.logPath);
+		this.bookListZero.forEach(book->this.testBookExistence(toRecoverSnapAndReplay, book));
+		
+		// commands since last snapshot on toRecoverSnapAndReplay = 9
+		
+		// set a new quantity for items 5-15
+		Collections.shuffle(bookListNonZero);
+		bookListNonZero.subList(5, 15).forEach(book->{
+														try {
+															toRecoverSnapAndReplay.addBook(book);
+														} catch (Exception e1) {
+															e1.printStackTrace();
+															fail("Cannot add a valid book!!");
+														}
+													});
+		bookListNonZero.subList(5, 15).forEach(book->{	
+														double copies = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(copies, book.getQuantity());
+														assertEquals(copies>0, true);
+													});
+		bookListNonZero.subList(0, 5).forEach(book->{	
+														double price = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(price, 0);
+													});
+		bookListNonZero.subList(15, 19).forEach(book->{	
+														double price = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(price, 0);
+													});
+		
+		// commands since last snapshot on toRecoverSnapAndReplay = 9
+		
+		// sell a copy for items 7-12, both 0-5 and 16-19 should have 0 quantity
+		bookListNonZero.subList(7, 12).forEach(book->{
+														try {
+															toRecoverSnapAndReplay.sellBook(new Book(book.getTitle(), 
+																										book.getID(), 
+																										2,
+																										book.getPrice()));
+														} catch (Exception e1) {
+															e1.printStackTrace();
+															fail("Cannot sell a valid book!");
+														}
+													});
+		bookListNonZero.subList(7, 12).forEach(book->{	
+														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(newQuant, book.getQuantity()-2);
+													});
+		bookListNonZero.subList(0, 5).forEach(book->{	
+														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(newQuant, 0);
+													});
+		bookListNonZero.subList(5, 7).forEach(book->{	
+														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(newQuant, book.getQuantity());
+													});
+		bookListNonZero.subList(12, 15).forEach(book->{	
+														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(newQuant, book.getQuantity());
+													});
+		bookListNonZero.subList(15, 19).forEach(book->{	
+														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+														assertEquals(newQuant, 0);
+													});
+		
+		// commands since last snapshot on toRecoverSnapAndReplay = 4
+		
+		// try and fail to sell a copy for items 15-19 (none exist)
+		bookListNonZero.subList(15, 19).forEach(book->{					
+						try{
+							toRecoverSnapAndReplay.sellBook(new Book(book.getTitle(), 
+																		book.getID(), 
+																		1,
+																		book.getPrice()));
+							fail("Didn't catch exception for selling books when none exists! Title: " + book.getTitle());
+						}
+						catch(Exception e) {/* pass */}
+						});
+		
+		// try and fail to sell a copy for items 15-19 (none exist)
+		bookListNonZero.subList(15, 19).forEach(book->{					
+						try{
+							toRecoverSnapAndReplay.updatePrice(new Book(book.getTitle(), 
+																		book.getID()+19, 
+																		book.getQuantity(),
+																		1.99));
+							fail("Didn't catch exception for updating book price when none exists! Title: " + book.getTitle());
+						}
+						catch(Exception e) {/* pass */}
+						});
+		
+		// commands since last snapshot on toRecoverSnapAndReplay = 4
+	
+		// set a new price for items 0-4
+		bookListNonZero.subList(0, 5).forEach(book->{
+														try {
+															toRecoverSnapAndReplay.updatePrice(book);
+														} catch (Exception e) {
+															e.printStackTrace();
+															fail("Cannot update price of valid book!");
+														}
+													});
+		bookListNonZero.subList(0, 5).forEach(book->{	
+														double origPrice = this.originalInventory.getPriceByID(book.getID());
+														double newPrice = toRecoverSnapAndReplay.getPriceByID(book.getID());
+														assertEquals(newPrice, book.getPrice());
+														assertEquals(newPrice!=origPrice, true);
+													});
+		bookListNonZero.subList(5, 19).forEach(book->{	
+														double origPrice = this.originalInventory.getPriceByID(book.getID());
+														double price = toRecoverSnapAndReplay.getPriceByID(book.getID());
+														assertEquals(price, origPrice);
+													});
+		
+		// try to recover the mix of actions we performed using the memento and log
+		Inventory newInventory = new PersistentInventory(this.logPath);
+		newInventory = new CommandDecorator(newInventory, this.logPath);
+		
+		for (Book book:bookListNonZero) {
+			double priceFromOldInventory = toRecoverSnapAndReplay.getPriceByID(book.getID());
+			double priceFromNewInventory = newInventory.getPriceByID(book.getID());
+			int quantFromOldInventory = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			int quantFromNewInventory = newInventory.getQuantityByID(book.getID());
+			assertEquals(priceFromOldInventory, priceFromNewInventory);
+			assertEquals(quantFromOldInventory, quantFromNewInventory);
+		}
+	}
+	
 	
 	public void testNonExistenceException(Inventory inventoryToTest, Book book){
 		try {
