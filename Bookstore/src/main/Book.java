@@ -17,7 +17,7 @@ public class Book implements Serializable{
 	public Book(String title, int id, int quantity, Double price) {
 		this.setTitle(title);
 		this.setID(id);
-		this.quantity = quantity;
+		this.setQuantity(quantity);
 		this.setPrice(price);
 	}
 
@@ -33,7 +33,9 @@ public class Book implements Serializable{
 		return this.id;
 	}
 
-	public void setID(int id) {
+	public void setID(int id) throws IllegalArgumentException{
+		if (id < 0)
+			throw new IllegalArgumentException("ID must be greater than or equal to zero.");
 		this.id = id;
 	}
 
@@ -41,12 +43,20 @@ public class Book implements Serializable{
 		return this.price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(double price) throws IllegalArgumentException{
+		if (price < 0)
+			throw new IllegalArgumentException("Price must be greater than or equal to zero.");
 		this.price = price;
 	}
 
 	public int getQuantity() {
 		return this.quantity;
+	}
+	
+	private void setQuantity(int quant) throws IllegalArgumentException{
+		if (quant < 0)
+			throw new IllegalArgumentException("Quantity must be greater than or equal to zero.");
+		this.quantity = quant;
 	}
 
 	public void incrementQuantity(int quantity) {

@@ -28,11 +28,12 @@ public class SimpleInventory implements Inventory{
 	}
 	
 	private int addNewBook(Book toAdd) {
-		if (toAdd.getID() < 0)
-			toAdd.setID(this.getNextValidID());
-		
+		Book toAddCopy = new Book(toAdd.getTitle(), 
+									toAdd.getID(), 
+									toAdd.getQuantity(), 
+									toAdd.getPrice());
 		this.titleToIDMap.put(toAdd.getTitle(), toAdd.getID());
-		this.idToBookMap.put(toAdd.getID(), toAdd);
+		this.idToBookMap.put(toAdd.getID(), toAddCopy);
 		return toAdd.getQuantity();
 	}
 	
@@ -45,7 +46,6 @@ public class SimpleInventory implements Inventory{
 	
 	@Override
 	public int sellBook(Book toSell) throws NoSuchElementException{
-		// TODO
 		if (!this.existsBook(toSell) || this.getQuantityByID(toSell.getID()) <= 0)
 			throw new NoSuchElementException();
 		Book bookReferenceToSellFrom = this.idToBookMap.get(toSell.getID());
@@ -55,7 +55,6 @@ public class SimpleInventory implements Inventory{
 	
 	@Override
 	public double updatePrice(Book toUpdate) {
-		// TODO
 		if (!this.existsBook(toUpdate))
 			throw new NoSuchElementException();
 		Book bookReferenceToUpdate = this.idToBookMap.get(toUpdate.getID());
