@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class ConcreteInventory implements Inventory{
+public class SimpleInventory implements Inventory{
 
 	/**
 	 * 
@@ -14,7 +14,7 @@ public class ConcreteInventory implements Inventory{
 	private Map<String, Integer> titleToIDMap;
 	private Map<Integer, Book> idToBookMap;
 	
-	public ConcreteInventory() {
+	public SimpleInventory() {
 		this.titleToIDMap = new HashMap<String, Integer>();
 		this.idToBookMap = new HashMap<Integer, Book>();
 	}

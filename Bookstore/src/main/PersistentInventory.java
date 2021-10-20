@@ -30,7 +30,7 @@ public class PersistentInventory implements Inventory{
 	public PersistentInventory(String logTo) {
 		this.filePath = logTo;
 		this.fullMementoPath = this.filePath + File.separator + this.fileName;
-		this.internalInventory = new ConcreteInventory();
+		this.internalInventory = new SimpleInventory();
 		this.actionsCount = 0;
 		this.recoverFromBackup();
 	}

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import main.Book;
 import main.CommandDecorator;
-import main.ConcreteInventory;
+import main.SimpleInventory;
 import main.Inventory;
 import main.PersistentInventory;
 
@@ -36,7 +36,7 @@ class TestInventory {
 	void setUp() throws Exception {
 		this.clearLogFiles(this.logPath);
 		
-		inventory = new ConcreteInventory();
+		inventory = new SimpleInventory();
 		inventory = new PersistentInventory(this.logPath);
 		inventory = new CommandDecorator(inventory, this.logPath);
 		
@@ -87,7 +87,7 @@ class TestInventory {
 		this.bookList.forEach(book->this.testBookExistence(this.inventory, book));
 		
 		
-		Inventory toRecoverToConcrete = new ConcreteInventory();
+		Inventory toRecoverToConcrete = new SimpleInventory();
 		this.bookList.forEach(book->this.testNonExistenceException(toRecoverToConcrete, book));
 		
 		Inventory toRecoverSnapshot = new PersistentInventory(this.logPath);
