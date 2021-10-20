@@ -119,13 +119,6 @@ public class SimpleInventory implements Inventory{
 			return false;
 	}
 	
-	private int getNextValidID() {
-		int nextID = this.idToBookMap.size(); 
-		while(this.idToBookMap.containsKey(nextID))
-			nextID++;
-		return nextID;
-	}
-	
 	public String toString() {
 		return String.valueOf(this.idToBookMap.size());
 	}
