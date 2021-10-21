@@ -89,7 +89,7 @@ public class PersistentInventory implements Inventory{
 	
 	private void dumpInventoryToFile() throws IOException {
 		File mementoFile = new File(this.mementoPrefix + this.serializedSuffix);
-		List<File> commandLogsAndInvMemento = this.getLogFiles();
+		List<File> commandLogsAndInvMemento = this.getCommandFiles();
 		commandLogsAndInvMemento.add(mementoFile);
 		
 		this.renameLogFiles(commandLogsAndInvMemento);
@@ -141,21 +141,18 @@ public class PersistentInventory implements Inventory{
 	
 	
 	private void renameLogFiles(List<File> filesList) {
-		filesList.forEach(file->{
-							File newName = new File("temp_"+file.getName());
-							file.renameTo(newName);
-							});
+		for (File file:filesList) {
+			File newName = new File("temp_"+file.getName());
+			file.renameTo(newName);
+		}
 	}
 	
 	
 	private void clearLogFiles(List<File> redundantFilesList) {
-		redundantFilesList.forEach(file->{
-										file = new File(this.filePath	+
-														File.separator	+
-														"temp_"			+
-														file.getName());
-										file.delete();	
-										});
+		for (File file:redundantFilesList) {
+			file = new File(this.filePath + File.separator + "temp_" + file.getName());
+			file.delete();			
+		}
 	}
 	
 	private void serializeCommand(InventoryCommand command) throws IOException {
@@ -190,9 +187,9 @@ public class PersistentInventory implements Inventory{
 		}
 	}
 	
-	private List<File> getLogFiles() throws IOException {
+	private List<File> getCommandFiles() throws IOException {
 		List<File> commandLogFiles = new ArrayList<File>();
-		String commandLogRegex = ".?command_\\d+\\.ser";
+		String commandLogRegex = this.commandPrefix + "\\d+\\" + this.serializedSuffix;
 		try {
 			commandLogFiles = Files.list(Paths.get(this.filePath))
 							        .filter(Files::isRegularFile)
