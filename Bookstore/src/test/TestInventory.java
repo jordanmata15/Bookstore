@@ -37,7 +37,7 @@ class TestInventory {
 		this.clearLogFiles(this.logPath);
 		
 		originalInventory = new SimpleInventory();
-		originalInventory = new PersistentInventory(originalInventory, this.logPath);
+		originalInventory = new PersistentInventory((SimpleInventory)originalInventory, this.logPath);
 		
 		bookListZero = new ArrayList<Book>(19);
 		bookListNonZero = new ArrayList<Book>(19);
@@ -170,7 +170,7 @@ class TestInventory {
 		this.bookListZero.forEach(book->this.testBookExistence(this.originalInventory , book));
 		
 		Inventory emptyInventory = new SimpleInventory();
-		Inventory toRecoverSnapAndReplay = new PersistentInventory(emptyInventory, this.logPath);
+		Inventory toRecoverSnapAndReplay = new PersistentInventory((SimpleInventory)emptyInventory, this.logPath);
 		this.bookListZero.forEach(book->this.testBookExistence(toRecoverSnapAndReplay, book));
 		
 		// commands since last snapshot on toRecoverSnapAndReplay = 9
@@ -286,7 +286,7 @@ class TestInventory {
 		
 		// try to recover the mix of actions we performed using the memento and log
 		Inventory newInventory = new SimpleInventory();
-		newInventory = new PersistentInventory(newInventory, this.logPath);
+		newInventory = new PersistentInventory((SimpleInventory)newInventory, this.logPath);
 		
 		for (Book book:bookListNonZero) {
 			double priceFromOldInventory = toRecoverSnapAndReplay.getPriceByID(book.getID());
