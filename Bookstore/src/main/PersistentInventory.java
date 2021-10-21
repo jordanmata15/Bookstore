@@ -11,16 +11,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class PersistentInventory implements Inventory{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
-	private Inventory decoratedInventory;
+	private SimpleInventory decoratedInventory;
 	private int commandsSoFar;
 	final private String filePath;
 	final private String commandPrefix = "command_";
@@ -28,7 +25,7 @@ public class PersistentInventory implements Inventory{
 	final private String serializedSuffix = ".ser";
 	final private int actionsBeforeDump = 10;
 	
-	public PersistentInventory(Inventory toDecorate, String logTo) throws ClassNotFoundException, IOException {
+	public PersistentInventory(SimpleInventory toDecorate, String logTo) throws ClassNotFoundException, IOException {
 		this.filePath = logTo;
 		this.decoratedInventory = toDecorate;
 		this.commandsSoFar = 0;
@@ -107,7 +104,9 @@ public class PersistentInventory implements Inventory{
 	
 	private boolean writeOutMemento() throws IOException {
 		File mementoFile = new File(this.mementoPrefix + this.serializedSuffix);
-		InventoryMemento currentState = new InventoryMemento(decoratedInventory);
+		InventoryMemento currentState = new InventoryMemento();
+		currentState.setState("TitleMap", this.decoratedInventory.getTitleMap());
+		currentState.setState("IDMap", this.decoratedInventory.getIDMap());
 		try {
 			FileOutputStream outputStream = new FileOutputStream(mementoFile);
 			ObjectOutputStream objectStream = new ObjectOutputStream(outputStream);
@@ -122,6 +121,7 @@ public class PersistentInventory implements Inventory{
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private void readInMemento() throws IOException, ClassNotFoundException {
 		File mementoFile = new File(this.mementoPrefix + this.serializedSuffix);
 		if (!mementoFile.exists())
@@ -129,11 +129,12 @@ public class PersistentInventory implements Inventory{
 		try {
 			FileInputStream outputStream = new FileInputStream(mementoFile);
 			ObjectInputStream objectStream = new ObjectInputStream(outputStream);
-			InventoryMemento inventoryMemento = (InventoryMemento) objectStream.readObject();
-			this.decoratedInventory = (SimpleInventory) inventoryMemento.getState();
+			InventoryMemento invMemento = (InventoryMemento) objectStream.readObject();
+			this.decoratedInventory.setTitleMap((Map<String, Integer>)invMemento.getState("TitleMap"));
+			this.decoratedInventory.setIDMap((Map<Integer, Book>)invMemento.getState("IDMap"));
 			objectStream.close();
 			outputStream.close();
-		}
+	}
 		catch (IOException | ClassNotFoundException e){
 			throw e;
 		}

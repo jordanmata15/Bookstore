@@ -5,11 +5,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class SimpleInventory implements Inventory{
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
 	private Map<String, Integer> titleToIDMap;
 	private Map<Integer, Book> idToBookMap;
@@ -84,6 +79,22 @@ public class SimpleInventory implements Inventory{
 	public double getPriceByID(Integer toFind) throws NoSuchElementException{
 		Book bookToFind = getBookByID(toFind);
 		return bookToFind.getPrice();
+	}
+	
+	protected Map<String, Integer> getTitleMap(){
+		return this.titleToIDMap;
+	}
+	
+	protected Map<Integer, Book> getIDMap(){
+		return this.idToBookMap;
+	}
+	
+	protected void setTitleMap(Map<String, Integer> titleMap){
+		this.titleToIDMap = titleMap;
+	}
+	
+	protected void setIDMap(Map<Integer, Book> idMap){
+		this.idToBookMap = idMap;
 	}
 	
 	private Book getBookByTitle(String toFind) {

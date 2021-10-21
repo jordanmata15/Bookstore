@@ -1,10 +1,9 @@
 package main;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.NoSuchElementException;
 
-public interface Inventory extends Serializable{
+public interface Inventory{
 	public int addBook(Book toAdd) throws IOException;
 	public int sellBook(Book toSell) throws IOException, NoSuchElementException;
 	public double updatePrice(Book toUpdate) throws IOException, NoSuchElementException;
