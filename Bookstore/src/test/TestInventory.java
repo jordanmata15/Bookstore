@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import main.Book;
-import main.CommandDecorator;
 import main.SimpleInventory;
 import main.Inventory;
 import main.PersistentInventory;
@@ -37,8 +36,8 @@ class TestInventory {
 	void setUp() throws Exception {
 		this.clearLogFiles(this.logPath);
 		
-		originalInventory = new PersistentInventory(this.logPath);
-		originalInventory = new CommandDecorator(originalInventory, this.logPath);
+		originalInventory = new SimpleInventory();
+		originalInventory = new PersistentInventory(originalInventory, this.logPath);
 		
 		bookListZero = new ArrayList<Book>(19);
 		bookListNonZero = new ArrayList<Book>(19);
@@ -90,22 +89,73 @@ class TestInventory {
 	void tearDown() throws Exception {
 	}
 	
-	//@Test
-	void testDoNothing() {}
-
 	@Test
+	void testSellBook() {
+		
+	}
+	
+	@Test
+	void testUpdatePrice() {
+	}
+
+	//@Test
 	void testAdd() throws Exception {
+		
 		for (Book book : this.bookListNonZero)
 			assertEquals(this.originalInventory.addBook(book), book.getQuantity());
 		
+		this.bookListNonZero.forEach(book->this.testBookExistence(this.originalInventory , book));
+		
+		/* test for adding 2x the original amount of books */
 		for (Book book : this.bookListNonZero)
 			assertEquals(this.originalInventory.addBook(book), 2*book.getQuantity());
 		
+		this.bookListNonZero.forEach(book->{
+			Book updatedCopies = new Book(book.getTitle(), 
+											book.getID(), 
+											2*book.getQuantity(), 
+											book.getPrice());
+			this.testBookExistence(this.originalInventory , updatedCopies);
+		});
+		
+		/* test for adding 3x the original amount of books */
 		for (Book book : this.bookListNonZero)
 			assertEquals(this.originalInventory.addBook(book), 3*book.getQuantity());
+		
+		this.bookListNonZero.forEach(book->{
+			Book updatedCopies = new Book(book.getTitle(), 
+											book.getID(), 
+											3*book.getQuantity(), 
+											book.getPrice());
+			this.testBookExistence(this.originalInventory , updatedCopies);
+		});
+		
+		/* test to add 10 to a random book */
+		int newCopiesN = 10;
+		Book catcher = new Book("The Catcher in the Rye", 14, newCopiesN, 80.99);
+		int originalCount = this.originalInventory.getQuantityByID(catcher.getID());
+		
+		this.originalInventory.addBook(catcher);
+		int newCount = this.originalInventory.getQuantityByTitle(catcher.getTitle());
+		assertEquals(newCount, originalCount+newCopiesN);
+		
+		/* add a random book */
+		int numCopiesToAdd = 2;
+		Book notExistsYet = new Book("Some Hot New Title!", 100, numCopiesToAdd, 10.22);
+		
+		try { // make sure it doesn't exist yet
+			this.originalInventory.getQuantityByTitle(notExistsYet.getTitle());
+			fail("Failed to throw exception for book that doesn't exist!");
+		} catch (NoSuchElementException e) { /* pass */}
+		
+		this.originalInventory.addBook(notExistsYet);
+		int numCopiesAdded = this.originalInventory.getQuantityByTitle(notExistsYet.getTitle());
+		assertEquals(numCopiesToAdd, numCopiesAdded);
 	}
 	
-	//@Test
+	
+	
+	@Test
 	void testRecoverInventory() throws Exception {
 		List<Book> originalList = new ArrayList<Book>();
 		this.bookListZero.forEach(book->originalList.add(new Book(book.getTitle(), 
@@ -119,130 +169,124 @@ class TestInventory {
 		
 		this.bookListZero.forEach(book->this.testBookExistence(this.originalInventory , book));
 		
-		Inventory toRecoverOnlySnapshot = new PersistentInventory(this.logPath);
-		this.bookListZero.subList(0,10).forEach(book->this.testBookExistence(toRecoverOnlySnapshot, book));
-		this.bookListZero.subList(10,19).forEach(book->this.testNonExistenceException(toRecoverOnlySnapshot, book));
-		
-		Inventory toRecoverOnlyReplay = new CommandDecorator(new PersistentInventory(""), this.logPath);
-		this.bookListZero.subList(0,10).forEach(book->this.testNonExistenceException(toRecoverOnlyReplay, book));
-		this.bookListZero.subList(10, 19).forEach(book->this.testBookExistence(toRecoverOnlyReplay, book));
-		
-		Inventory toRecoverSnapAndReplay = new CommandDecorator(toRecoverOnlySnapshot, this.logPath);
+		Inventory emptyInventory = new SimpleInventory();
+		Inventory toRecoverSnapAndReplay = new PersistentInventory(emptyInventory, this.logPath);
 		this.bookListZero.forEach(book->this.testBookExistence(toRecoverSnapAndReplay, book));
 		
 		// commands since last snapshot on toRecoverSnapAndReplay = 9
 		
+		
 		// set a new quantity for items 5-15
 		Collections.shuffle(bookListNonZero);
 		bookListNonZero.subList(5, 15).forEach(book->{
-														try {
-															toRecoverSnapAndReplay.addBook(book);
-														} catch (Exception e1) {
-															e1.printStackTrace();
-															fail("Cannot add a valid book!!");
-														}
-													});
+			try {
+				toRecoverSnapAndReplay.addBook(book);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				fail("Cannot add a valid book!!");
+			}
+		});
 		bookListNonZero.subList(5, 15).forEach(book->{	
-														double copies = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(copies, book.getQuantity());
-														assertEquals(copies>0, true);
-													});
+			double copies = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(copies, book.getQuantity());
+			assertEquals(copies>0, true);
+		});
 		bookListNonZero.subList(0, 5).forEach(book->{	
-														double price = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(price, 0);
-													});
+			double price = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(price, 0);
+		});
 		bookListNonZero.subList(15, 19).forEach(book->{	
-														double price = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(price, 0);
-													});
+			double price = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(price, 0);
+		});
 		
 		// commands since last snapshot on toRecoverSnapAndReplay = 9
 		
 		// sell a copy for items 7-12, both 0-5 and 16-19 should have 0 quantity
 		bookListNonZero.subList(7, 12).forEach(book->{
-														try {
-															toRecoverSnapAndReplay.sellBook(new Book(book.getTitle(), 
-																										book.getID(), 
-																										2,
-																										book.getPrice()));
-														} catch (Exception e1) {
-															e1.printStackTrace();
-															fail("Cannot sell a valid book!");
-														}
-													});
+			try {
+				toRecoverSnapAndReplay.sellBook(new Book(book.getTitle(), 
+															book.getID(), 
+															2,
+															book.getPrice()));
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				fail("Cannot sell a valid book!");
+			}
+		});
 		bookListNonZero.subList(7, 12).forEach(book->{	
-														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(newQuant, book.getQuantity()-2);
-													});
+			int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(newQuant, book.getQuantity()-2);
+		});
 		bookListNonZero.subList(0, 5).forEach(book->{	
-														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(newQuant, 0);
-													});
+			int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(newQuant, 0);
+		});
 		bookListNonZero.subList(5, 7).forEach(book->{	
-														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(newQuant, book.getQuantity());
-													});
+			int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(newQuant, book.getQuantity());
+		});
 		bookListNonZero.subList(12, 15).forEach(book->{	
-														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(newQuant, book.getQuantity());
-													});
+			int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(newQuant, book.getQuantity());
+		});
 		bookListNonZero.subList(15, 19).forEach(book->{	
-														int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
-														assertEquals(newQuant, 0);
-													});
+			int newQuant = toRecoverSnapAndReplay.getQuantityByID(book.getID());
+			assertEquals(newQuant, 0);
+		});
 		
 		// commands since last snapshot on toRecoverSnapAndReplay = 4
 		
 		// try and fail to sell a copy for items 15-19 (none exist)
 		bookListNonZero.subList(15, 19).forEach(book->{					
-						try{
-							toRecoverSnapAndReplay.sellBook(new Book(book.getTitle(), 
-																		book.getID(), 
-																		1,
-																		book.getPrice()));
-							fail("Didn't catch exception for selling books when none exists! Title: " + book.getTitle());
-						}
-						catch(Exception e) {/* pass */}
-						});
+			try{
+				toRecoverSnapAndReplay.sellBook(new Book(book.getTitle(), 
+															book.getID(), 
+															1,
+															book.getPrice()));
+				fail("Didn't catch exception for selling books when none exists! Title: " + book.getTitle());
+			}
+			catch(Exception e) {/* pass */}
+		});
 		
 		// try and fail to sell a copy for items 15-19 (none exist)
 		bookListNonZero.subList(15, 19).forEach(book->{					
-						try{
-							toRecoverSnapAndReplay.updatePrice(new Book(book.getTitle(), 
-																		book.getID()+19, 
-																		book.getQuantity(),
-																		1.99));
-							fail("Didn't catch exception for updating book price when none exists! Title: " + book.getTitle());
-						}
-						catch(Exception e) {/* pass */}
-						});
+			try{
+				toRecoverSnapAndReplay.updatePrice(new Book(book.getTitle(), 
+															book.getID()+19, 
+															book.getQuantity(),
+															1.99));
+				fail("Didn't catch exception for updating book price when none exists! Title: " + book.getTitle());
+			}
+			catch(Exception e) {/* pass */}
+		});
 		
 		// commands since last snapshot on toRecoverSnapAndReplay = 4
-	
+		
 		// set a new price for items 0-4
 		bookListNonZero.subList(0, 5).forEach(book->{
-														try {
-															toRecoverSnapAndReplay.updatePrice(book);
-														} catch (Exception e) {
-															e.printStackTrace();
-															fail("Cannot update price of valid book!");
-														}
-													});
+			try {
+				toRecoverSnapAndReplay.updatePrice(book);
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail("Cannot update price of valid book!");
+			}
+		});
 		bookListNonZero.subList(0, 5).forEach(book->{	
-														double origPrice = this.originalInventory.getPriceByID(book.getID());
-														double newPrice = toRecoverSnapAndReplay.getPriceByID(book.getID());
-														assertEquals(newPrice, book.getPrice());
-														assertEquals(newPrice!=origPrice, true);
-													});
+			double origPrice = this.originalInventory.getPriceByID(book.getID());
+			double newPrice = toRecoverSnapAndReplay.getPriceByID(book.getID());
+			assertEquals(newPrice, book.getPrice());
+			assertEquals(newPrice!=origPrice, true);
+		});
 		bookListNonZero.subList(5, 19).forEach(book->{	
-														double origPrice = this.originalInventory.getPriceByID(book.getID());
-														double price = toRecoverSnapAndReplay.getPriceByID(book.getID());
-														assertEquals(price, origPrice);
-													});
+			double origPrice = this.originalInventory.getPriceByID(book.getID());
+			double price = toRecoverSnapAndReplay.getPriceByID(book.getID());
+			assertEquals(price, origPrice);
+		});
 		
 		// try to recover the mix of actions we performed using the memento and log
-		Inventory newInventory = new PersistentInventory(this.logPath);
-		newInventory = new CommandDecorator(newInventory, this.logPath);
+		Inventory newInventory = new SimpleInventory();
+		newInventory = new PersistentInventory(newInventory, this.logPath);
 		
 		for (Book book:bookListNonZero) {
 			double priceFromOldInventory = toRecoverSnapAndReplay.getPriceByID(book.getID());
