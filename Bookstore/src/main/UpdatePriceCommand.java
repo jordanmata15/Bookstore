@@ -17,7 +17,7 @@ public class UpdatePriceCommand extends InventoryCommand{
 	}
 	
 	@Override
-	public double execute(Inventory toExecuteOn) throws NoSuchElementException, IOException {
+	public double execute(SimpleInventory toExecuteOn) throws NoSuchElementException, IOException {
 		return toExecuteOn.updatePrice(toExecuteWith);
 	}
 }

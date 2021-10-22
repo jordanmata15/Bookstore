@@ -12,9 +12,7 @@ import java.util.NoSuchElementException;
  */
 public class AddBookCommand extends InventoryCommand{
 
-	/**
-	 * Base version
-	 */
+	/** Base version */
 	private static final long serialVersionUID = 1L;
 	
 	Book toExecuteWith;
@@ -35,7 +33,7 @@ public class AddBookCommand extends InventoryCommand{
 	 * @throws IOException if the command fails to be serialized.
 	 */
 	@Override
-	public double execute(Inventory toExecuteOn) throws IOException {
+	public double execute(SimpleInventory toExecuteOn) throws IOException {
 		return toExecuteOn.addBook(toExecuteWith);
 	}
 }
