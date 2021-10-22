@@ -98,7 +98,7 @@ class TestInventory {
 	void testUpdatePrice() {
 	}
 
-	//@Test
+	@Test
 	void testAdd() throws Exception {
 		
 		for (Book book : this.bookListNonZero)
@@ -328,7 +328,7 @@ class TestInventory {
 		assertEquals(inventoryToTest.getQuantityByTitle(book.getTitle()), book.getQuantity());
 	}
 
-	private void clearLogFiles(String folder) {
+	private void clearLogFiles(String folder) throws IOException {
 		List<File> commandLogFiles = new ArrayList<File>();
 		String commandLogRegex = ".+?.ser";
 		try {
@@ -338,8 +338,9 @@ class TestInventory {
 							        .filter(file->Pattern.matches(commandLogRegex, file.getName()))
 							        .collect(Collectors.toList());
 			commandLogFiles.forEach(file->file.delete());
+			//commandLogFiles.forEach(file->System.out.println(file.exists()));			
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		}
 	}
 }
