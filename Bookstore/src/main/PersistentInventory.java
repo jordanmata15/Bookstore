@@ -85,7 +85,8 @@ public class PersistentInventory implements Inventory{
 	
 	
 	private void dumpInventoryToFile() throws IOException {
-		File mementoFile = new File(this.mementoPrefix + this.serializedSuffix);
+		String mementoFileName = this.fullFilePath(this.mementoPrefix + this.serializedSuffix);
+		File mementoFile = new File(mementoFileName);
 		List<File> commandLogsAndInvMemento = this.getCommandFiles();
 		commandLogsAndInvMemento.add(mementoFile);
 		
@@ -103,7 +104,8 @@ public class PersistentInventory implements Inventory{
 	
 	
 	private boolean writeOutMemento() throws IOException {
-		File mementoFile = new File(this.mementoPrefix + this.serializedSuffix);
+		String fileName = this.fullFilePath(this.mementoPrefix + this.serializedSuffix);
+		File mementoFile = new File(fileName);
 		InventoryMemento currentState = new InventoryMemento();
 		currentState.setState("TitleMap", this.decoratedInventory.getTitleMap());
 		currentState.setState("IDMap", this.decoratedInventory.getIDMap());
@@ -123,7 +125,8 @@ public class PersistentInventory implements Inventory{
 	
 	@SuppressWarnings("unchecked")
 	private void readInMemento() throws IOException, ClassNotFoundException {
-		File mementoFile = new File(this.mementoPrefix + this.serializedSuffix);
+		String fileName = this.fullFilePath(this.mementoPrefix + this.serializedSuffix);
+		File mementoFile = new File(fileName);
 		if (!mementoFile.exists())
 			return;
 		try {
@@ -142,19 +145,22 @@ public class PersistentInventory implements Inventory{
 	
 	
 	private void renameLogFiles(List<File> filesList) {
-		for (File file:filesList) {
-			File newName = new File("temp_"+file.getName());
-			file.renameTo(newName);
-		}
+		filesList.forEach(file->{
+			String newFileName = this.fullFilePath("temp_"+file.getName());
+			File newFile = new File(newFileName);
+			file.renameTo(newFile);
+		});
 	}
 	
 	
 	private void clearLogFiles(List<File> redundantFilesList) {
-		for (File file:redundantFilesList) {
-			file = new File(this.filePath + File.separator + "temp_" + file.getName());
-			file.delete();			
-		}
+		redundantFilesList.forEach(file->{
+			String newFileName = this.fullFilePath("temp_"+file.getName());
+			File tempFile = new File(newFileName);
+			tempFile.delete();
+			});
 	}
+	
 	
 	private void serializeCommand(InventoryCommand command) throws IOException {
 		this.validatePreviousCommandNumber();
