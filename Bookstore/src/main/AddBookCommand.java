@@ -1,16 +1,14 @@
 package main;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 /**
- * Command object used to add an object to the inventory.
+ * Command object used to add a book to the inventory.
  * Serializable to allow command to be written and read from
  * disk.
  * @author Jordan
- *
  */
-public class AddBookCommand extends InventoryCommand{
+public class AddBookCommand implements InventoryCommand{
 
 	/** Base version */
 	private static final long serialVersionUID = 1L;
@@ -18,15 +16,15 @@ public class AddBookCommand extends InventoryCommand{
 	Book toExecuteWith;
 	
 	/**
-	 * Simple constructor.
-	 * @param toAdd the book object to add to the inventory.
+	 * AddBookCommand constructor.
+	 * @param toAdd the book object to add to the inventory. The book should contain
+	 * 			the ID of the book to add and the quantity of the book to add.
 	 */
 	public AddBookCommand(Book toAdd) {
 		this.toExecuteWith = toAdd;
 	}
 	
 	/**
-	 * TODO make inventory a simpleInventory
 	 * Add this particular book to the inventory.
 	 * @param toExectuteOn inventory object to call the command from.
 	 * @return The number of copies of this book in the inventory after adding.
