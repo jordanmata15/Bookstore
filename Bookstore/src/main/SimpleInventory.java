@@ -4,16 +4,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+/**
+ * Inventory object with basic add, sell, update price, and lookup actions.
+ * @author Jordan
+ *
+ */
 public class SimpleInventory implements Inventory{
 	
 	private Map<String, Integer> titleToIDMap;
 	private Map<Integer, Book> idToBookMap;
 	
+	/**
+	 * SimpleInventory Constructor.
+	 */
 	public SimpleInventory() {
 		this.titleToIDMap = new HashMap<String, Integer>();
 		this.idToBookMap = new HashMap<Integer, Book>();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int addBook(Book toAdd) {
 		if (this.existsBookTitle(toAdd.getTitle()))
@@ -22,6 +33,11 @@ public class SimpleInventory implements Inventory{
 			return this.addNewBook(toAdd);
 	}
 	
+	/**
+	 * Adds the book to our intenal maps for easy lookup later.
+	 * @param toAdd	The book to add to our database.
+	 * @return number of copies of this book after adding.
+	 */
 	private int addNewBook(Book toAdd) {
 		Book toAddCopy = new Book(toAdd.getTitle(), 
 									toAdd.getID(), 
@@ -32,6 +48,12 @@ public class SimpleInventory implements Inventory{
 		return toAdd.getQuantity();
 	}
 	
+	/**
+	 * Increment the quantity of the book with this unique ID.
+	 * @param toAdd	Book object with the unique ID and quantity we need. Other 
+	 * 				fields are ignored.
+	 * @return total number of copies after the addition.
+	 */
 	private int addExistingBook(Book toAdd) {
 		Integer uniqueID = toAdd.getID();
 		Book bookReferenceToAddTo = this.idToBookMap.get(uniqueID);
@@ -39,6 +61,9 @@ public class SimpleInventory implements Inventory{
 		return bookReferenceToAddTo.getQuantity();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int sellBook(Book toSell) throws NoSuchElementException{
 		if (!this.existsBook(toSell) || this.getQuantityByID(toSell.getID()) <= 0)
@@ -48,8 +73,11 @@ public class SimpleInventory implements Inventory{
 		return bookReferenceToSellFrom.getQuantity();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public double updatePrice(Book toUpdate) {
+	public double updatePrice(Book toUpdate) throws NoSuchElementException{
 		if (!this.existsBook(toUpdate))
 			throw new NoSuchElementException();
 		Book bookReferenceToUpdate = this.idToBookMap.get(toUpdate.getID());
@@ -57,47 +85,79 @@ public class SimpleInventory implements Inventory{
 		return bookReferenceToUpdate.getPrice();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getQuantityByTitle(String toFind) throws NoSuchElementException{
 		Book bookToFind = getBookByTitle(toFind);
 		return bookToFind.getQuantity();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getQuantityByID(Integer toFind) throws NoSuchElementException{
 		Book bookToFind = getBookByID(toFind);
 		return bookToFind.getQuantity();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double getPriceByTitle(String toFind) throws NoSuchElementException{
 		Book bookToFind = getBookByTitle(toFind);
 		return bookToFind.getPrice();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double getPriceByID(Integer toFind) throws NoSuchElementException{
 		Book bookToFind = getBookByID(toFind);
 		return bookToFind.getPrice();
 	}
 	
+	/**
+	 * @return Map from title to the ID of the books.
+	 */
 	protected Map<String, Integer> getTitleMap(){
 		return this.titleToIDMap;
 	}
 	
+	/**
+	 * @return Map from ID to the reference of the books.
+	 */
 	protected Map<Integer, Book> getIDMap(){
 		return this.idToBookMap;
 	}
 	
+	/**
+	 * Reset the title map to a different state.
+	 * @param titleMap	New map of titles to unique ID's.
+	 */
 	protected void setTitleMap(Map<String, Integer> titleMap){
 		this.titleToIDMap = titleMap;
 	}
 	
+	/**
+	 * Reset the ID map to a different state.
+	 * @param titleMap	New map of unique ID's to book objects.
+	 */
 	protected void setIDMap(Map<Integer, Book> idMap){
 		this.idToBookMap = idMap;
 	}
 	
-	private Book getBookByTitle(String toFind) {
+	/**
+	 * Get the reference of a book from the title.
+	 * @param toFind	title of the book to find.
+	 * @return	book referenced by the title.
+	 * @throws NoSuchElementException if the book title doesn't exist in our inventory.
+	 */
+	private Book getBookByTitle(String toFind) throws NoSuchElementException{
 		if (!this.existsBookTitle(toFind))
 			throw new NoSuchElementException();
 		Integer bookUniqueID = this.titleToIDMap.get(toFind);
@@ -105,17 +165,33 @@ public class SimpleInventory implements Inventory{
 		return bookReferenceToFind;
 	}
 	
-	private Book getBookByID(Integer toFind) {
+	/**
+	 * Get the reference of a book from the unique ID.
+	 * @param toFind	unique ID of the book to find.
+	 * @return	book referenced by the unique ID.
+	 * @throws NoSuchElementException if the unique ID doesn't exist in our inventory.
+	 */
+	private Book getBookByID(Integer toFind) throws NoSuchElementException {
 		if (!this.existsBookID(toFind))
 			throw new NoSuchElementException();
 		Book bookReferenceToFind = this.idToBookMap.get(toFind);
 		return bookReferenceToFind;
 	}
 	
+	/**
+	 * Check if a book reference exists within our database. Checks the unique ID.
+	 * @param toCheck	Book with the unique ID to look for.
+	 * @return	true if the unique ID exists in our database. False otherwise.
+	 */
 	private boolean existsBook(Book toCheck) {
 		return this.existsBookID(toCheck.getID());
 	}
 	
+	/**
+	 * Check if a unique ID exists within our database.
+	 * @param toCheck	unique ID to look for.
+	 * @return	true if the unique ID exists in our database. False otherwise.
+	 */
 	private boolean existsBookID(Integer id) {
 		if (this.idToBookMap.containsKey(id))
 			return true;
@@ -123,14 +199,15 @@ public class SimpleInventory implements Inventory{
 			return false;
 	}
 	
+	/**
+	 * Check if a title exists within our database.
+	 * @param toCheck	title to look for.
+	 * @return	true if the title exists in our database. False otherwise.
+	 */
 	private boolean existsBookTitle(String title) {
 		if (this.titleToIDMap.containsKey(title))
 			return true;
 		else
 			return false;
-	}
-	
-	public String toString() {
-		return String.valueOf(this.idToBookMap.size());
 	}
 }
