@@ -14,9 +14,7 @@ import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +25,7 @@ import main.PersistentInventory;
 
 class TestInventory {
 
-	String logPath = "C:\\Users\\Jordan\\git\\Bookstore\\Bookstore";
+	String logPath = "."; // full file path to where to log your serialized files to
 	Inventory originalInventory ;
 	List<Book> bookListZero;
 	List<Book> bookListNonZero;
@@ -87,15 +85,58 @@ class TestInventory {
  
 	@AfterEach
 	void tearDown() throws Exception {
+		this.clearLogFiles(this.logPath);
 	}
 	
 	@Test
-	void testSellBook() {
+	void testSellBook() throws NoSuchElementException, IOException {
 		
+		try {
+			this.originalInventory.sellBook(new Book("Does Not Exist", 10888, 0, 10.0));
+			fail("Didn't throw exception for selling a nonexistent book!");
+		} catch (NoSuchElementException e) {
+			// pass
+		}
+		
+		for (Book book : this.bookListNonZero)
+			assertEquals(this.originalInventory.addBook(book), book.getQuantity());
+		
+		for (Book book : this.bookListNonZero)
+			assertEquals(this.originalInventory.sellBook(book), 0);
+		
+		int numToAdd = 20;
+		int numToSell = 5;
+		int oldCount = this.originalInventory.getQuantityByTitle("A Tale of Two Cities");
+		assertEquals(oldCount, 0);
+		this.originalInventory.addBook(new Book("A Tale of Two Cities", 11, numToAdd, 13.99));
+		assertEquals(this.originalInventory.getQuantityByTitle("A Tale of Two Cities"), numToAdd);
+		assertEquals(this.originalInventory.sellBook(new Book("A Tale of Two Cities", 11, numToSell, 13.99)), 
+						numToAdd-numToSell);
+		assertEquals(this.originalInventory.getQuantityByTitle("A Tale of Two Cities"), 
+						numToAdd-numToSell);
 	}
 	
 	@Test
-	void testUpdatePrice() {
+	void testUpdatePrice() throws IOException {
+		
+		try {
+			this.originalInventory.updatePrice(new Book("Does Not Exist", 10888, 0, 10.0));
+			fail("Didn't throw exception for updating a nonexistent book!");
+		} catch (NoSuchElementException e) {
+			// pass
+		}
+
+		for (Book book : this.bookListNonZero)
+			assertEquals(this.originalInventory.addBook(book), book.getQuantity());
+		
+		double oldPrice = this.originalInventory.getPriceByTitle("Storm Front");
+		double newPrice = 10.50;
+		
+		assertEquals(this.originalInventory.getPriceByTitle("Storm Front"), oldPrice);
+		assertEquals(this.originalInventory.updatePrice(new Book("Storm Front", 10, 0, newPrice)), 
+						newPrice);
+		assertEquals(this.originalInventory.getPriceByTitle("Storm Front"), 
+						newPrice);
 	}
 
 	@Test
@@ -337,8 +378,7 @@ class TestInventory {
 							        .map(Path::toFile)
 							        .filter(file->Pattern.matches(commandLogRegex, file.getName()))
 							        .collect(Collectors.toList());
-			commandLogFiles.forEach(file->file.delete());
-			//commandLogFiles.forEach(file->System.out.println(file.exists()));			
+			commandLogFiles.forEach(file->file.delete());	
 		} catch (IOException e) {
 			throw e;
 		}
