@@ -13,7 +13,7 @@ public class AddBookCommand implements InventoryCommand{
 	/** Base version */
 	private static final long serialVersionUID = 1L;
 	
-	Book toExecuteWith;
+	private Book toExecuteWith;
 	
 	/**
 	 * AddBookCommand constructor.
