@@ -45,7 +45,7 @@ public interface Inventory{
 	/**
 	 * Find the price of the book in our database.
 	 * @param toFind	title of the book to find.
-	 * @return the number of copies of the requested book remaining.
+	 * @returnthe number of copies of the requested book remaining.
 	 * @throws NoSuchElementException if the title does not exist in the database.
 	 */
 	public int getQuantityByTitle(String toFind) throws NoSuchElementException;
@@ -53,7 +53,7 @@ public interface Inventory{
 	/**
 	 * Find the quantity of the book in our database.
 	 * @param toFind	unique ID of the book to find.
-	 * @return the number of copies of the requested book remaining.
+	 * @returnthe number of copies of the requested book remaining.
 	 * @throws NoSuchElementException if the ID does not exist in the database.
 	 */
 	public int getQuantityByID(Integer toFind) throws NoSuchElementException;
@@ -69,20 +69,8 @@ public interface Inventory{
 	/**
 	 * Find the quantity of the book in our database.
 	 * @param toFind	unique ID of the book to find.
-	 * @return the price of the requested book.
+	 * @returnthe price of the requested book.
 	 * @throws NoSuchElementException if the ID does not exist in the database.
 	 */
 	public double getPriceByID(Integer toFind) throws NoSuchElementException;
-	
-	/**
-	 * Save the current state of the inventory as a memento object.
-	 * @return	Inventory memento object.
-	 */
-	public InventoryMemento saveState();
-	
-	/**
-	 * Given an inventory memento object, allows this inventory to be restored to
-	 * the state of the memento.
-	 */
-	public void restoreState(InventoryMemento stateToRestore);
 }

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * Inventory decorator that serializes commands that change the internal state of the 
- * inventory as they are executed. Serializes the entire inventory after a given number
+ * inventory as they are executed. Serializes the entire invetory after a given number
  * of commands.
  * @author Jordan
  *
@@ -30,15 +30,17 @@ public class PersistentInventory implements Inventory{
 	final private String serializedSuffix = ".ser";
 	final private int actionsBeforeDump = 10;
 	
-	private Inventory decoratedInventory;
+	private SimpleInventory decoratedInventory;
 	private int commandsSoFar;
 	
 	/**
 	 * PersistentInventory constructor. Attempts to restore the state of the inventory
 	 * serialized in the provided file path. Reads in the following files:
 	 * 
-	 * command_#.ser 	(# is any integer greater than or equal to 0)
+	 * command_#.ser
 	 * InventoryMemento.ser
+	 * 
+	 * Where # is any integer greater than or equal to 0.
 	 * 
 	 * @param toDecorate	Inventory object to decorate.
 	 * @param logTo			File path containing any serialized commands/inventories to restore.
@@ -46,7 +48,7 @@ public class PersistentInventory implements Inventory{
 	 * @throws ClassNotFoundException if the command/memento read in is not the correct class.
 	 * @throws IOException if there is an error reading or writing to the serialized files.
 	 */
-	public PersistentInventory(Inventory toDecorate, String logTo) throws ClassNotFoundException, 
+	public PersistentInventory(SimpleInventory toDecorate, String logTo) throws ClassNotFoundException, 
 																				IOException {
 		this.filePath = logTo;
 		this.decoratedInventory = toDecorate;
@@ -161,6 +163,7 @@ public class PersistentInventory implements Inventory{
 		File mementoFile = new File(mementoFileName);
 		List<File> commandLogsAndInvMemento = this.getCommandFiles();
 		commandLogsAndInvMemento.add(mementoFile);
+		
 		this.renameLogFiles(commandLogsAndInvMemento);
 		this.serializeInventory();
 		this.clearLogFiles(commandLogsAndInvMemento);
@@ -187,7 +190,9 @@ public class PersistentInventory implements Inventory{
 	private void serializeInventory() throws IOException {
 		String fileName = this.fullFilePath(this.mementoPrefix + this.serializedSuffix);
 		File mementoFile = new File(fileName);
-		InventoryMemento currentState = this.decoratedInventory.saveState();
+		InventoryMemento currentState = new InventoryMemento();
+		currentState.setState("TitleMap", this.decoratedInventory.getTitleMap());
+		currentState.setState("IDMap", this.decoratedInventory.getIDMap());
 		try {
 			FileOutputStream outputStream = new FileOutputStream(mementoFile);
 			ObjectOutputStream objectStream = new ObjectOutputStream(outputStream);
@@ -206,6 +211,7 @@ public class PersistentInventory implements Inventory{
 	 * @throws IOException	if there was an issue reading the memento related to IO issues.
 	 * @throws ClassNotFoundException	if the read in file is not an InventoryMemento object.
 	 */
+	@SuppressWarnings("unchecked")
 	private void deserializeInventory() throws IOException, ClassNotFoundException {
 		String fileName = this.fullFilePath(this.mementoPrefix + this.serializedSuffix);
 		File mementoFile = new File(fileName);
@@ -214,8 +220,9 @@ public class PersistentInventory implements Inventory{
 		try {
 			FileInputStream outputStream = new FileInputStream(mementoFile);
 			ObjectInputStream objectStream = new ObjectInputStream(outputStream);
-			InventoryMemento savedState = (InventoryMemento) objectStream.readObject();
-			this.decoratedInventory.restoreState(savedState);
+			InventoryMemento invMemento = (InventoryMemento) objectStream.readObject();
+			this.decoratedInventory.setTitleMap((Map<String, Integer>)invMemento.getState("TitleMap"));
+			this.decoratedInventory.setIDMap((Map<Integer, Book>)invMemento.getState("IDMap"));
 			objectStream.close();
 			outputStream.close();
 		}
@@ -364,21 +371,5 @@ public class PersistentInventory implements Inventory{
 	 */
 	private String fullFilePath(String filename) {
 		return this.filePath.concat(File.separator+filename);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public InventoryMemento saveState() {
-		return this.decoratedInventory.saveState();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void restoreState(InventoryMemento stateToRestore) {
-		this.decoratedInventory.restoreState(stateToRestore);
 	}
 }

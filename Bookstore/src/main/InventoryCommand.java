@@ -22,5 +22,5 @@ public interface InventoryCommand extends Serializable{
 	 * 			attempting to sell and insufficient amount to sell.
 	 * @throws IOException if the command fails to be serialized.
 	 */
-	public abstract double execute(Inventory decoratedInventory) throws NoSuchElementException, IOException;
+	public abstract double execute(SimpleInventory toExecuteOn) throws NoSuchElementException, IOException;
 }

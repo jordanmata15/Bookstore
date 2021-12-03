@@ -35,7 +35,7 @@ class TestInventory {
 		this.clearLogFiles(this.logPath);
 		
 		originalInventory = new SimpleInventory();
-		originalInventory = new PersistentInventory(originalInventory, this.logPath);
+		originalInventory = new PersistentInventory((SimpleInventory)originalInventory, this.logPath);
 		
 		bookListZero = new ArrayList<Book>(19);
 		bookListNonZero = new ArrayList<Book>(19);
