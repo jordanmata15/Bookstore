@@ -14,7 +14,7 @@ public class SellBookCommand implements InventoryCommand{
 	/** Base version */
 	private static final long serialVersionUID = 1L;
 	
-	Book toExecuteWith;
+	private Book toExecuteWith;
 	
 	/**
 	 * SellBookCommand Constructor.
