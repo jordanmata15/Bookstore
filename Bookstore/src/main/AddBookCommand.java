@@ -31,7 +31,7 @@ public class AddBookCommand implements InventoryCommand{
 	 * @throws IOException if the command fails to be serialized.
 	 */
 	@Override
-	public double execute(SimpleInventory toExecuteOn) throws IOException {
+	public double execute(Inventory toExecuteOn) throws IOException {
 		return toExecuteOn.addBook(toExecuteWith);
 	}
 }

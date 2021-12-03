@@ -122,33 +122,22 @@ public class SimpleInventory implements Inventory{
 	}
 	
 	/**
-	 * @return Map from title to the ID of the books.
+	 * {@inheritDoc}
 	 */
-	protected Map<String, Integer> getTitleMap(){
-		return this.titleToIDMap;
+	public InventoryMemento saveState() {
+		InventoryMemento currentState = new InventoryMemento();
+		currentState.setState("TitleMap", this.titleToIDMap);
+		currentState.setState("IDMap", this.idToBookMap);
+		return currentState;
 	}
 	
 	/**
-	 * @return Map from ID to the reference of the books.
+	 * {@inheritDoc}
 	 */
-	protected Map<Integer, Book> getIDMap(){
-		return this.idToBookMap;
-	}
-	
-	/**
-	 * Reset the title map to a different state.
-	 * @param titleMap	New map of titles to unique ID's.
-	 */
-	protected void setTitleMap(Map<String, Integer> titleMap){
-		this.titleToIDMap = titleMap;
-	}
-	
-	/**
-	 * Reset the ID map to a different state.
-	 * @param titleMap	New map of unique ID's to book objects.
-	 */
-	protected void setIDMap(Map<Integer, Book> idMap){
-		this.idToBookMap = idMap;
+	@SuppressWarnings("unchecked")
+	public void restoreState(InventoryMemento stateToRestore) {
+		this.titleToIDMap = (Map<String, Integer>)stateToRestore.getState("TitleMap");
+		this.idToBookMap = (Map<Integer, Book>)stateToRestore.getState("IDMap");
 	}
 	
 	/**

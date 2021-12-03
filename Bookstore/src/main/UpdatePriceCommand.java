@@ -34,7 +34,7 @@ public class UpdatePriceCommand implements InventoryCommand{
 	 * @throws IOException if the command fails to be serialized.
 	 */
 	@Override
-	public double execute(SimpleInventory toExecuteOn) throws NoSuchElementException, IOException {
+	public double execute(Inventory toExecuteOn) throws NoSuchElementException, IOException {
 		return toExecuteOn.updatePrice(toExecuteWith);
 	}
 }
