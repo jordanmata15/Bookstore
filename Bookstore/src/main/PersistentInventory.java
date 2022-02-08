@@ -47,7 +47,7 @@ public class PersistentInventory implements Inventory{
 	 * @throws IOException if there is an error reading or writing to the serialized files.
 	 */
 	public PersistentInventory(Inventory toDecorate, String logTo) throws ClassNotFoundException, 
-																				IOException {
+										IOException {
 		this.filePath = logTo;
 		this.decoratedInventory = toDecorate;
 		this.commandsSoFar = 0;
@@ -257,9 +257,9 @@ public class PersistentInventory implements Inventory{
 	 */
 	private void serializeCommand(InventoryCommand command) throws IOException {
 		this.validatePreviousCommandNumber();
-		String filePath = this.fullFilePath(this.commandPrefix 		+ 
-											this.commandsSoFar 		+ 
-											this.serializedSuffix);
+		String filePath = this.fullFilePath(this.commandPrefix + 
+								this.commandsSoFar + 
+								this.serializedSuffix);
 		File nextLogFile = new File(filePath);
 		try {
 			FileOutputStream outputStream = new FileOutputStream(nextLogFile);
@@ -350,9 +350,9 @@ public class PersistentInventory implements Inventory{
 	 * @return	true if it exists on disk, false otherwise.
 	 */
 	private boolean existsCommandLogFile(int commandNumber) {
-		String filePath = this.fullFilePath(this.commandPrefix 		+ 
-											commandNumber 			+ 
-											this.serializedSuffix);
+		String filePath = this.fullFilePath(this.commandPrefix + 
+							commandNumber + 
+							this.serializedSuffix);
 		File commandFile = new File(filePath);
 		return commandFile.exists();
 	}
